@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Models\Post;
+use App\Models\Category;
 use Spatie\YamlFrontMatter\YamlFrontMatter;
 
 /*
@@ -51,19 +52,25 @@ Route::get('/', function () {
     // $posts = Post::all();
 
     return view('posts',[
-        'posts' =>Post::all()
+        'posts' =>Post::with('category')->get()
     ]);
   
 });
 
-Route::get('posts/{post}', function ($slug) {
+Route::get('posts/{post}', function (Post $post) {
 
    // Find a post by its slug and pass it to a view called "post"
 
    return view('post',[
-    'post'=>Post::findOrFail($slug)
+    'post'=>$post
     
    ]);
    
 
+});
+
+Route::get('categories/{category:slug}',function (Category $category){
+    return view('posts',[
+        'posts' =>$category->posts
+    ]);
 });
