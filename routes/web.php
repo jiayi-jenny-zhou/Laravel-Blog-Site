@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\RegisterController;
 use Illuminate\Support\Facades\Route;
 
 use App\Models\Post;
@@ -18,67 +20,8 @@ use Spatie\YamlFrontMatter\YamlFrontMatter;
 |
 */
 
-Route::get('/', function () {
-    // $files =  File::files(resource_path("posts/"));
+Route::get('/', [PostController::class, 'index'])->name('home');
+Route::get('posts/{post}', [PostController::class,'show']);
+Route::get('register', [RegisterController::class,'create']);
+Route::post('register', [RegisterController::class,'store']);
 
-    // $posts = collect($files)
-    //     ->map(function($file){
-    //         return YamlFrontMatter::parseFile($file);
-    //     })
-    //     ->map(function($document) {
-    //         return new Post(
-    //             $document->title,
-    //             $document->excerpt,
-    //             $document->date,
-    //             $document->body(),
-    //             $document->slug
-    //         );
-    //     });
-
-    // $posts = array_map(function ($file){
-    //     $document=YamlFrontMatter::parseFile($file);
-    //     return new Post(
-    //         $document->title,
-    //         $document->excerpt,
-    //         $document->date,
-    //         $document->body(),
-    //         $document->slug
-    //     );
-    // },$files);
-
-    return view('posts',[
-        'posts' =>Post::latest()->with('category','author')->get(),
-        'categories' => Category::all()
-    ]);
-  
-})->name('home');
-
-Route::get('posts/{post}', function (Post $post) {
-
-   // Find a post by its slug and pass it to a view called "post"
-
-   return view('post',[
-    'post'=>$post
-    
-    
-   ]);
-   
-
-});
-
-Route::get('categories/{category:slug}',function (Category $category){
-    return view('posts',[
-        'posts' =>$category->posts,
-        'currentCategory' => $category,
-        'categories' => Category::all() 
-        
-    ]); 
-})->name('category');
-
-Route::get('authors/{author:username}',function (User $author){
-    return view('posts',[
-        'posts' =>$author->posts->load('category','author'),
-        'categories' => Category::all() 
-
-    ]);
-});
